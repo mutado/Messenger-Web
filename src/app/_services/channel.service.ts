@@ -4,7 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 import { User } from '../_models/user';
 import { ApiResponse, Pagination } from '../_models/apiresponse';
-import { Message } from '../_models';
+import { Message } from '../_models/message';
 import { Channel } from '../_models/channel';
 
 @Injectable({ providedIn: 'root' })

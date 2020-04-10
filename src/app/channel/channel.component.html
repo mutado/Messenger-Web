@@ -3,7 +3,7 @@
         <h4>{{channel.name}}</h4>
     </div>
     <div *ngFor="let message of messages" class=" d-flex justify-content-end flex-column" style="overflow-y: scroll;">
-        <div class="rounded-pill">
+        <div class="rounded-pill m-2 p-2 bg-secondary text-white">
             {{message.content}}
         </div>
     </div>
