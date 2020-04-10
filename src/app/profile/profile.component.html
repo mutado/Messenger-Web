@@ -1,0 +1,13 @@
+<div class="card">
+    <h4 class="card-header">Profile</h4>
+    <div class="card-body">
+        <div *ngIf="loading" class="spinner-border spinner-border-sm"></div>
+        <div *ngIf="!loading">
+            <p>Name: {{curentUser.name}}</p>
+            <p>Username: {{curentUser.username}}</p>
+            <p>Email: {{curentUser.email}}</p>
+            <p>Role: {{curentUser.role}}</p>
+            <p>Token: {{curentUser.token}}</p>
+        </div>
+    </div>
+</div>

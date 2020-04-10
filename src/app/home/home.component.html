@@ -1,0 +1,28 @@
+<div class="card mt-4">
+    <h4 class="card-header">info</h4>
+    <div class="card-body">
+        <p>Hub page of messenger</p>
+        <p>Your role is: <strong>{{currentUser.role}}</strong>.</p>
+        <p>All your dialogs:</p>
+    </div>
+    <h4 class="card-header">Dialogs</h4>
+    <div class="card-body">
+        <div *ngIf="loading" class="spinner-border spinner-border-sm"></div>
+        <div *ngFor="let channel of channels">
+
+            <!-- channel -->
+            <a [routerLink]="['/channel',channel.id]" class="d-flex justify-content-between align-items-center mb-4 p-3 bg-dark text-white rounded-pill">
+                <div>
+                    {{channel.name}}
+                </div>
+                <div class="text-muted">
+                    {{channel.members}}
+                    <span *ngIf="channel.members == 1;else multiple_members">member</span>
+                    <ng-template #multiple_members>members</ng-template>
+                </div>
+            </a>
+
+
+        </div>
+    </div>
+</div>

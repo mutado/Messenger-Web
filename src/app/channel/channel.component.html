@@ -1,0 +1,25 @@
+<div class="card h-100">
+    <div class="card-header">
+        <h4>{{channel.name}}</h4>
+    </div>
+    <div *ngFor="let message of messages" class=" d-flex justify-content-end flex-column" style="overflow-y: scroll;">
+        <div class="rounded-pill">
+            {{message.content}}
+        </div>
+    </div>
+    <span *ngIf="loading" class="spinner-border spinner-border-sm mr-1"></span>
+
+    <form [formGroup]="sendMessageForm" (ngSubmit)="onSubmit()" style="height: 60px;"
+        class="card-header d-flex flex-row">
+        <div class="input-group flex-grow-1">
+            <input type="text" placeholder="Write your message..." formControlName="message" class="form-control h-100"
+                id="message" [ngClass]="{'is-invalid': submitted && f.channelName.errors }">
+            <div class="input-group-append">
+                <button [disabled]="!sendMessageForm.valid" class="btn btn-primary h-100">
+                    <span *ngIf="sending" class="spinner-border spinner-border-sm mr-1"></span>
+                    SEND
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
