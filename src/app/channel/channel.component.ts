@@ -21,8 +21,6 @@ export class ChannelComponent implements OnInit, OnDestroy {
   user: User;
   messages: Message[];
   channel: Channel = new Channel();
-  page: number;
-  last_page: number;
   loading: boolean;
   sendMessageForm: FormGroup;
   submitted: boolean;
@@ -84,14 +82,18 @@ export class ChannelComponent implements OnInit, OnDestroy {
     console.log("display")
     // retrieve data from socket
     // this.messages = this.sock.currentChannelMessages.data;
-    this.page = this.sock.currentChannelMessages.current_page;
-    this.last_page = this.sock.currentChannelMessages.last_page;
+    console.log("current page "+this.msgs.current_page)
+
+    if (this.msgs.data.length<50){
+      this.appendMessages();
+    }
 
     // Display shit so fucking slow
     // Needs to be done 1 ms after
     setTimeout(() => {
       $('#go-bottom-btn').click(this.scrollDown);
       $('#message-box').scroll(this.scrollCheck.bind(this));
+
       var msgbox = $('#message-box');
       msgbox.scrollTop(msgbox.prop("scrollHeight"));
     }, 1);
@@ -127,14 +129,15 @@ export class ChannelComponent implements OnInit, OnDestroy {
 
   appending: boolean = false;
   public appendMessages = () => {
-    if (!this.appending && this.page != this.last_page) {
+    if (!this.appending && this.msgs.current_page != 1) {
+      console.log("appending")
       // Used to prevent multiple appendings in one time
       this.appending = true;
-      this.channelService.getMessages(this.channel, this.page + 1).subscribe(data => {
+      this.channelService.getMessages(this.channel, this.msgs.current_page - 1).subscribe(data => {
 
         // Get page data
-        this.page = data.success.current_page;
-        this.last_page = data.success.last_page;
+        this.msgs.current_page = data.success.current_page;
+        this.msgs.last_page = data.success.last_page;
 
         var msgbox = $('#message-box')
 
@@ -143,7 +146,7 @@ export class ChannelComponent implements OnInit, OnDestroy {
         var srcTop = msgbox.scrollTop();
 
         // Append messages
-        this.msgs.data = data.success.data.reverse().concat(this.msgs.data)
+        this.msgs.data = data.success.data.concat(this.msgs.data)
         setTimeout(() => {
           // Restore scrollbar position
           var hdiff = msgbox.prop("scrollHeight") - scrHeight;

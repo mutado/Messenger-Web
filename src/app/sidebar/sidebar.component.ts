@@ -44,24 +44,25 @@ export class SidebarComponent implements OnInit {
   }
 
   public search() {
-    // this.channels = <Channel[]>[];
-    // var searchInput = $('#search').val()
+    console.log('search')
+    this.displayChannels = <Channel[]>[];
+    var searchInput = $('#search').val()
     
-    // if (searchInput.charAt(0) == "@") {
-      
-    // }
-    // else {
-    // this.channelsHidden.forEach(element => {
-    //   if (element.name.includes($('#search').val())) {
-    //     this.channels.push(element);
-    //   }
-    // });
-    //   var ch = new Channel();
-    //   ch.name = searchInput;
-    //   this.channelService.search(ch).subscribe(data => {
-
-    //     this.channels = this.channels.concat(data.success);
-    //   })
-    // }
+    if (searchInput.charAt(0) == "@") {
+      console.log("user find")
+    }
+    else {
+      this.allChannels.map(ch=>{
+        if (ch.name.includes($('#search').val()))
+          return ch;
+      })
+      var ch = new Channel();
+      ch.name = searchInput;
+      this.channelService.search(ch).subscribe(data => {
+        // this.displayChannels = this.allChannels.concat(data.success);
+        var ids = new Set(this.displayChannels.map(d => d.id));
+        this.displayChannels = [...this.displayChannels, ...data.success.filter(d => !ids.has(d.id))];
+      })
+    }
   }
 }

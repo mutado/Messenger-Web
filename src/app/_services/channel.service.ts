@@ -42,7 +42,7 @@ export class ChannelService {
         return this.http.post<ApiResponse<Channel>>(`${environment.apiUrl}/channel`, channel);
     }
 
-    getMessages(channel: Channel, page = 1) {
+    getMessages(channel: Channel, page = 0) {
         return this.http.get<ApiResponse<Pagination<Message[]>>>(`${environment.apiUrl}/channel/${channel.id}/messages?page=${page}`);
     }
 

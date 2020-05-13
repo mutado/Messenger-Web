@@ -127,7 +127,6 @@ export class WebSocketService {
     // Loading first page of messages
     this.channelService.getMessages(ch).subscribe(data => {
       chListener.channel._messages = data.success;
-      chListener.channel._messages.data.reverse();
       chListener.channel.messagesLoadedEvent.next(true);
       chListener.channel.displayReady = Promise.resolve(true);
       chListener.channel.loadedMessages = true;

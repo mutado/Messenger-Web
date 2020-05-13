@@ -11,7 +11,7 @@
       </h5>
     </a>
   </div>
-  <ul class="list-group overflow-auto h-100" *ngIf="this.sock.loaded | async">
+  <ul class="list-group overflow-auto h-100">
     <input
       type="text"
       id="search"
@@ -19,6 +19,7 @@
       (keyup)="this.search()"
       placeholder="Search for channel"
       style="border: none; border-radius: 0;"
+      autocomplete="off"
     />
     <a
       *ngFor="let channel of displayChannels"
