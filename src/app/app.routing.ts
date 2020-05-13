@@ -8,6 +8,8 @@ import { Role } from './_models/role';
 import { ProfileComponent } from './profile/profile.component';
 import { ChannelCreateComponent } from './channel-create/channel-create.component';
 import { ChannelComponent } from './channel/channel.component';
+import { SettingsComponent } from './settings/settings.component';
+import { AddContactComponent } from './add-contact/add-contact.component';
 
 const routes: Routes = [
     {
@@ -35,7 +37,18 @@ const routes: Routes = [
     },
     {
         path: 'channel/:channelId',
-        component: ChannelComponent
+        component: ChannelComponent,
+        canActivate: [AuthGuard],
+    },
+    {
+        path: 'settings',
+        component: SettingsComponent,
+        canActivate: [AuthGuard],
+    },
+    {
+        path: 'contact/add',
+        component: AddContactComponent,
+        canActivate: [AuthGuard],
     },
 
     // otherwise redirect to home

@@ -1,25 +1,70 @@
-<div class="card h-100">
-    <div class="card-header">
-        <h4>{{channel.name}}</h4>
-    </div>
-    <div *ngFor="let message of messages" class=" d-flex justify-content-end flex-column" style="overflow-y: scroll;">
-        <div class="rounded-pill m-2 p-2 bg-secondary text-white">
-            {{message.content}}
-        </div>
-    </div>
-    <span *ngIf="loading" class="spinner-border spinner-border-sm mr-1"></span>
+<div class="card h-100 rounded-0" style="border: none;">
+  <!-- Header -->
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <a href="/">
+      <img
+        src="https://img.icons8.com/ios/50/000000/back--v1.png"
+        height="20px"
+      />
+    </a>
+    <h4>{{ this.channel.name }}</h4>
+    <a href="channel/{{ this.channel.id }}/info">
+      <img
+        src="https://img.icons8.com/ios/50/000000/back--v1.png"
+        height="20px"
+        style="transform: rotate(180deg);"
+      />
+    </a>
+  </div>
 
-    <form [formGroup]="sendMessageForm" (ngSubmit)="onSubmit()" style="height: 60px;"
-        class="card-header d-flex flex-row">
-        <div class="input-group flex-grow-1">
-            <input type="text" placeholder="Write your message..." formControlName="message" class="form-control h-100"
-                id="message" [ngClass]="{'is-invalid': submitted && f.channelName.errors }">
-            <div class="input-group-append">
-                <button [disabled]="!sendMessageForm.valid" class="btn btn-primary h-100">
-                    <span *ngIf="sending" class="spinner-border spinner-border-sm mr-1"></span>
-                    SEND
-                </button>
-            </div>
-        </div>
-    </form>
+  <!-- Messages -->
+  <div class="h-100 overflow-auto">
+    <div  *ngIf="(sock.displayReady | async) && (sock.selectedChannel.channel.displayReady | async)" class="h-100 overflow-auto" id="message-box">
+      <li 
+        *ngFor="let message of msgs.data"
+        class="message-bubble"
+        [ngClass]="this.message.userSender == this.user.id ? 'me' : 'him'"
+      >
+        {{ message.content }}
+      </li>
+    </div>
+  </div>
+
+  <!-- Input -->
+  <form
+    [formGroup]="sendMessageForm"
+    (ngSubmit)="onSubmit()"
+    class="d-flex flex-row card-header"
+    style="height: 70px !important;"
+  >
+    <div *ngIf="this.joined;else other_content" class="input-group">
+      <input
+        type="text"
+        placeholder="Write your message..."
+        formControlName="message"
+        class="form-control h-100"
+        id="message"
+        [ngClass]="{ 'is-invalid': submitted && f.channelName.errors }"
+      />
+      <div class="input-group-append">
+        <button [disabled]="!sendMessageForm.valid" class="btn btn-primary">
+          <span
+            *ngIf="sending"
+            class="spinner-border spinner-border-sm mr-1"
+          ></span>
+          SEND
+        </button>
+      </div>
+    </div>
+    <ng-template #other_content>
+      <button class="btn btn-primary btn-block" (click)="join()">JOIN</button>
+    </ng-template>
+  </form>
 </div>
+
+<button id="go-bottom-btn" class="hidden">
+  <img
+    src="https://img.icons8.com/ios/50/000000/expand-arrow--v2.png"
+    height="30"
+  />
+</button>

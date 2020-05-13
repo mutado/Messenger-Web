@@ -1,0 +1,35 @@
+.message-bubble {
+  display: inline-block;
+  clear: both;
+  padding: 10px;
+  border-radius: 20px;
+  margin-bottom: 2px;
+  background: #eee;
+  margin: 2px 5px;
+
+  max-width: 70%;
+}
+
+.him {
+  background: #eee;
+  float: left;
+  border-bottom-left-radius: 5px;
+}
+.him+.him{
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+}
+
+.me {
+  float: right;
+  background: #0084ff;
+  color: #fff;
+  border-bottom-right-radius: 5px;
+}
+
+.me + .me{
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+
+

@@ -13,40 +13,44 @@ import { Channel } from '../_models/channel';
 export class ChannelCreateComponent implements OnInit {
   curentUser: User;
   createChannelFrom: FormGroup;
-  submitted:boolean;
-  loading:boolean;
+  submitted: boolean = false;
+  loading: boolean = false;
 
   constructor(
     private formBuilder: FormBuilder,
     private authenticationService: AuthenticationService,
     private channelService: ChannelService,
-  ) { 
+  ) {
     this.curentUser = authenticationService.currentUserValue;
   }
 
   ngOnInit(): void {
     this.createChannelFrom = this.formBuilder.group({
-      channelName: ['',Validators.required],
-      channelPrivacy: ['',Validators.required],
+      channelName: ['', Validators.required],
+      channelPrivacy: ['', Validators.required],
     })
   }
 
   get f() { return this.createChannelFrom.controls; }
 
-  onSubmit(){
+  onSubmit() {
     this.submitted = true;
-    if(this.createChannelFrom.invalid)
-    {
+    if (this.createChannelFrom.invalid) {
       return;
     }
     this.loading = true;
     var channel = new Channel();
     channel.name = this.f.channelName.value;
-    this.channelService.create(channel).subscribe(response=>{
+    this.channelService.create(channel).subscribe(response => {
       this.loading = false;
       console.log(response);
       var channel = response.success;
       console.log(channel.name + " created successfully")
+      this.channelService.join(channel).subscribe(data => {
+        window.location.href = '/channel/' + channel.id;
+      })
+
+
     })
   }
 }

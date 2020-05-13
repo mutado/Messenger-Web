@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { first } from 'rxjs/operators';
 
 import { AuthenticationService } from '../_services/authentication.service';
+import { WebSocketService } from '../_services/web-socket.service';
 
 
 @Component({
@@ -17,12 +18,14 @@ export class LoginComponent implements OnInit {
   submitted = false;
   returnUrl: string;
   error = '';
+  status:string;
 
   constructor(
       private formBuilder: FormBuilder,
       private route: ActivatedRoute,
       private router: Router,
-      private authenticationService: AuthenticationService
+      private authenticationService: AuthenticationService,
+      private socketService:WebSocketService
   ) { 
       // redirect to home if already logged in
       if (this.authenticationService.currentUserValue) { 
@@ -38,6 +41,8 @@ export class LoginComponent implements OnInit {
 
       // get return url from route parameters or default to '/'
       this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
+
+      this.authenticationService.getStatus().subscribe(data=>{this.status = data.toString()})
   }
 
   // convenience getter for easy access to form fields
@@ -55,6 +60,7 @@ export class LoginComponent implements OnInit {
           .pipe(first())
           .subscribe(
               data => {
+                  this.socketService.connect();
                   this.router.navigate([this.returnUrl]);
               },
               error => {

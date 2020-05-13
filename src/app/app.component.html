@@ -1,5 +1,5 @@
 <!-- nav -->
-<nav class="navbar navbar-expand navbar-dark bg-dark" *ngIf="currentUser">
+<!-- <nav class="navbar navbar-expand navbar-dark bg-dark" *ngIf="currentUser">
     <div class="navbar-nav">
         <a class="nav-item nav-link" routerLink="/">Home</a>
         <a class="nav-item nav-link" routerLink="/profile">Profile</a>
@@ -7,9 +7,12 @@
         <a class="nav-item nav-link" (click)="logout()">Logout</a>
 
     </div>
-</nav>
+</nav> -->
 
 <!-- main app container -->
-<div class="container h-100">
-    <router-outlet></router-outlet>
+<div class="d-flex h-100">
+  <app-sidebar class="flex-shrink-1 bd-highlight" *ngIf="currentUser"></app-sidebar>
+    <div class="flex-fill h-100 overflow-hidden">
+        <router-outlet class=""></router-outlet>
+    </div>
 </div>

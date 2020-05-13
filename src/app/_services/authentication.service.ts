@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Output, EventEmitter } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
@@ -12,6 +12,7 @@ export class AuthenticationService {
     public currentUser: Observable<User>;
 
     constructor(private http: HttpClient) {
+        console.log("ctor")
         this.currentUserSubject = new BehaviorSubject<User>(JSON.parse(localStorage.getItem('currentUser')));
         this.currentUser = this.currentUserSubject.asObservable();
     }
@@ -25,25 +26,29 @@ export class AuthenticationService {
             .pipe(
                 catchError(this.handleError),
                 map(user => {
-                // login successful if there's a jwt token in the response
-                if (user.success && user.success.token) {
-                    // store user details and jwt token in local storage to keep user logged in between page refreshes
-                    localStorage.setItem('currentUser', JSON.stringify(user.success));
-                    this.currentUserSubject.next(user.success);
-                }
-                console.log("sign in successful");
-                return user.success;
-            }));
+                    // login successful if there's a jwt token in the response
+                    if (user.success && user.success.token) {
+                        // store user details and jwt token in local storage to keep user logged in between page refreshes
+                        localStorage.setItem('currentUser', JSON.stringify(user.success));
+                        this.currentUserSubject.next(user.success);
+                    }
+                    return user.success;
+                }));
+    }
+
+    getStatus(){
+        return this.http.get(`${environment.apiUrl}/status`);
     }
 
     logout() {
         // remove user from local storage to log user out
         localStorage.removeItem('currentUser');
         this.currentUserSubject.next(null);
+        window.location.reload(false); 
     }
 
     private handleError(error: HttpErrorResponse) {
         return throwError(
-          'Your username or password is incorect');
-      };
+            'Your username or password is incorect');
+    };
 }

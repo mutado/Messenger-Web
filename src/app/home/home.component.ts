@@ -4,6 +4,9 @@ import { User } from '../_models/user';
 import { AuthenticationService } from '../_services/authentication.service';
 import { Channel } from '../_models/channel';
 import { ChannelService } from '../_services/channel.service';
+import { MessageService } from '../_services/message.service';
+import {Message} from '../_models/message';
+import { WebSocketService } from '../_services/web-socket.service';
 
 @Component({
   selector: 'app-home',
@@ -20,17 +23,26 @@ export class HomeComponent implements OnInit {
   constructor(
     private authenticationService: AuthenticationService,
     private channelService: ChannelService,
+    private messageService: MessageService,
+    private socketService: WebSocketService
   ) {
     this.currentUser = this.authenticationService.currentUserValue;
   }
 
   ngOnInit() {
-    console.log(this.currentUser);
     this.loading = true;
-    this.channelService.getUsersChannels().subscribe(response=>{
-      var channels = response.success;
+
+    this.channelService.getUsersChannels().subscribe(ch=>{
+      this.channels = ch.success;
       this.loading = false;
-      this.channels = channels;
+    })
+  }
+
+  sendTestMessage(){
+    console.log("sending test message");
+    var mes = new Message('test message',1,1,1,false);
+    this.messageService.sendMessage(mes).subscribe(mes=>{
+      console.log(mes);
     })
   }
 }

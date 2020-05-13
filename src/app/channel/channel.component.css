@@ -1,4 +1,49 @@
-/* .message-box{
-    position: fixed;
-    bottom: 0;
-} */
+.message-bubble {
+  display: inline-block;
+  clear: both;
+  padding: 10px;
+  border-radius: 20px;
+  margin-bottom: 2px;
+  background: #eee;
+  margin: 2px 5px;
+
+  max-width: 70%;
+}
+
+.him {
+  background: #eee;
+  float: left;
+  border-bottom-left-radius: 5px;
+}
+.him + .him {
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+}
+
+.me {
+  float: right;
+  background: #0084ff;
+  color: #fff;
+  border-bottom-right-radius: 5px;
+}
+
+.me + .me {
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+
+#go-bottom-btn{
+  position: fixed !important;
+  bottom: 75px !important;
+  right: 30px;
+  border-radius: 50%;
+  border: solid 1px gray;
+  padding: 5px;
+  background-color: rgba(240, 240, 240,0.8);
+  
+  transition: ease-out 0.3s;
+}
+
+#go-bottom-btn.hidden{
+  right: -50px;
+}

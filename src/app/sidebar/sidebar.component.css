@@ -1,0 +1,19 @@
+.card ul{
+    /* max-height: 100%; */
+    overflow-y:scroll;
+    -webkit-overflow-scrolling: touch;
+}
+
+.card ul a{
+    border-radius: 0 !important;
+    border-right: none;
+    border-left: none;
+}
+
+.card{
+    height: 100%;
+}
+
+.btn{
+    padding: 2px !important;
+}

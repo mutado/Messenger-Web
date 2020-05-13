@@ -1,0 +1,12 @@
+<div class="jumbotron jumbotron-fluid">
+    <div class="container">
+        <div>
+            <h1 class="display-4 inline">@{{this.user.username}}</h1>
+        </div>
+      <ul class="list-group">
+          <li class="list-group-item lead">Email: {{this.user.email}}</li>
+          <li class="list-group-item lead">Role: {{this.user.role}}</li>
+        </ul>
+        <button class="btn btn-danger btn-block mt-1" (click)="logout()">Log out</button>
+    </div>
+  </div>

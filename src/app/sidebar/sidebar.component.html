@@ -1,0 +1,44 @@
+<div
+  class="card rounded-0"
+  style="border: none; border-right: 1px solid lightgray;"
+>
+  <div class="card-header" style="height: 60px !important;">
+    <a href="/" class="text-dark">
+      <h5 class="pt-2">
+        <b>
+          Messenger
+        </b>
+      </h5>
+    </a>
+  </div>
+  <ul class="list-group overflow-auto h-100">
+    <input type="text" id="search" class="list-group-item" (keyup)="this.search()" placeholder="Search for channel" style="border: none; border-radius: 0;">
+    <a
+      *ngFor="let channel of channels"
+      [routerLink]="['/channel/'+channel.id]"
+      class="list-group-item list-group-item-action"
+      [ngClass]="this.selectedChatId == channel.id ? 'disabled' : ''"
+      >{{ channel.name }}</a
+    >
+  </ul>
+  <div
+    class="card-header d-flex justify-content-around"
+    style="height: 70px !important;"
+  >
+    <a [routerLink]="['/settings']" class="btn btn-light">
+      <img
+        src="https://img.icons8.com/ios/50/000000/settings.png"
+        height="35px"
+      />
+    </a>
+    <a [routerLink]="['/channel/create']" class="btn btn-light">
+      <img src="https://img.icons8.com/ios/50/000000/add.png" height="35px" />
+    </a>
+    <a [routerLink]="['/contact/add']" class="btn btn-light">
+      <img
+        src="https://img.icons8.com/ios/50/000000/add-user-male.png"
+        height="35px"
+      />
+    </a>
+  </div>
+</div>

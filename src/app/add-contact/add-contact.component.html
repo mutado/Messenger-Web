@@ -1,0 +1,23 @@
+<div class="jumbotron jumbotron-fluid">
+  <form [formGroup]="contactForm" class="container">
+    <h1 class="display-4 mb-4">Add contact</h1>
+    <div class="form-group">
+      <label for="name" class="lead">Full name</label>
+      <input type="text" id="fullname" class="form-control" />
+    </div>
+    <div class="form-group">
+      <label for="phone" class="lead">Phone number</label>
+      <input type="text" id="phone" class="form-control" value="+" />
+      <small id="emailHelp" class="form-text text-muted"
+        >Enter contact's phone number</small
+      >
+    </div>
+    <button [disabled]="loading" type="submit" class="btn btn-block btn-primary">
+      <span
+        *ngIf="loading"
+        class="spinner-border spinner-border-sm mr-1"
+      ></span>
+      Add contact
+    </button>
+  </form>
+</div>
