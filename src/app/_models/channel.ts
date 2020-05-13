@@ -8,7 +8,8 @@ export class Channel {
     id:number;
     name:string;
     members:number;
-    loadedMessages = new Subject<boolean>();
+    messagesLoadedEvent = new Subject<boolean>();
+    loadedMessages = false;
     _messages = new Pagination<Message[]>();
     messages = new Subject<Message>();
     displayReady:Promise<boolean>;

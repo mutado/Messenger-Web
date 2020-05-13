@@ -7,7 +7,7 @@
         height="20px"
       />
     </a>
-    <h4>{{ this.channel.name }}</h4>
+    <h4 *ngIf="this.sock.displayReady | async">{{ this.sock.selectedChannel.channel.name }}</h4>
     <a href="channel/{{ this.channel.id }}/info">
       <img
         src="https://img.icons8.com/ios/50/000000/back--v1.png"

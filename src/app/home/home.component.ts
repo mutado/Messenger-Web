@@ -30,12 +30,6 @@ export class HomeComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.loading = true;
-
-    this.channelService.getUsersChannels().subscribe(ch=>{
-      this.channels = ch.success;
-      this.loading = false;
-    })
   }
 
   sendTestMessage(){

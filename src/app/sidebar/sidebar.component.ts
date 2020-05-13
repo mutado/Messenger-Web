@@ -13,42 +13,55 @@ declare var $: any;
 })
 export class SidebarComponent implements OnInit {
   loading: boolean;
-  channels: Channel[];
-  channelsHidden: Channel[];
-  selectedChatId: number
+  displayChannels: Channel[];
+  private allChannels: Channel[];
+
   constructor(
     private channelService: ChannelService,
     private route: ActivatedRoute,
     private socketService: WebSocketService
   ) { }
 
+  get sock() {
+    return this.socketService;
+  }
+
   ngOnInit(): void {
-    this.channelService.getUsersChannels().subscribe(ch => {
-      this.channels = ch.success;
-      this.channelsHidden = ch.success;
+    this.socketService.loaded.subscribe(ch => {
+      this.allChannels = this.socketService.channels.map(chl=>chl.channel);
+      this.displayChannels = this.allChannels;
       this.loading = false;
     })
   }
 
-  public search() {
-    this.channels = <Channel[]>[];
-    var searchInput = $('#search').val()
-    
-    if (searchInput.charAt(0) == "@") {
-      
+  get selectedChatId(){
+    try{
+      return this.socketService.selectedChannel.channel.id;
     }
-    else {
-    this.channelsHidden.forEach(element => {
-      if (element.name.includes($('#search').val())) {
-        this.channels.push(element);
-      }
-    });
-      var ch = new Channel();
-      ch.name = searchInput;
-      this.channelService.search(ch).subscribe(data => {
+    catch{
+      return 0;
+    }
+  }
 
-        this.channels = this.channels.concat(data.success);
-      })
-    }
+  public search() {
+    // this.channels = <Channel[]>[];
+    // var searchInput = $('#search').val()
+    
+    // if (searchInput.charAt(0) == "@") {
+      
+    // }
+    // else {
+    // this.channelsHidden.forEach(element => {
+    //   if (element.name.includes($('#search').val())) {
+    //     this.channels.push(element);
+    //   }
+    // });
+    //   var ch = new Channel();
+    //   ch.name = searchInput;
+    //   this.channelService.search(ch).subscribe(data => {
+
+    //     this.channels = this.channels.concat(data.success);
+    //   })
+    // }
   }
 }

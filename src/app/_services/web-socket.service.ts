@@ -14,17 +14,19 @@ import { resolve } from 'dns';
 })
 export class WebSocketService {
   readonly uri = "localhost:6001";
-  public selectedChannel : ChannelListener;
+  public selectedChannel: ChannelListener;
   public channels = [new ChannelListener()];
   public joinedChannels = new Subject<ChannelListener>();
   public loaded = new Subject<boolean>();
-  public displayReady:Promise<boolean>;
+  public loadedHappened = false;
+  public displayReady: Promise<boolean>;
+  public selected = new Subject<boolean>();
 
-  get currentChannelMessages(){
-    try{
+  get currentChannelMessages() {
+    try {
       return this.selectedChannel.channel._messages;
     }
-    catch(e){return null}
+    catch (e) { return null }
   }
 
   constructor(
@@ -105,50 +107,77 @@ export class WebSocketService {
    * @param channels 
    */
   JoinChannels(channels: Channel[]) {
-    console.log("Joining channels");
-    var i = 0;
     this.channels.shift();
     channels.forEach(ch => {
-      i++;
       // Joining all channels for notifications
-      var chListener = new ChannelListener();
-      chListener.channel = ch;
-      chListener.name = `channel.${ch.id}`;
-      chListener.listener = window.Echo.join(chListener.name);
-      chListener.channel.messages = new Subject<Message>()
-      chListener.channel.loadedMessages = new Subject<boolean>()
-
-      // Loading first page of messages
-      this.channelService.getMessages(ch).subscribe(data => {
-        chListener.channel._messages = data.success;
-        chListener.channel._messages.data.reverse();
-        chListener.channel.loadedMessages.next(true);
-        chListener.channel.displayReady = Promise.resolve(true);
-      })
-
-      // Listen for new messages
-      chListener.listener.listen('.NewMessage', (data) => {
-        // Broadcast new message to subject
-        chListener.channel.messages.next(data.message);
-      })
-
-      // Retrieve new message from subject
-      chListener.channel.messages.subscribe((msg: any) => {
-        console.log("message recieved: " + msg.content)
-        //add message to front of array
-        chListener.channel._messages.data.push(msg);
-      })
-      this.channels.push(chListener);
-      
-      this.joinedChannels.next(null)
-      console.log("joining")
+      this.channels.push(this.createChListener(ch));
     });
-    console.log("Channels joined " + i);
     this.loaded.next(true);
+    this.loadedHappened = true;
   }
-  
-  selectChannel(channelId){
-    this.selectedChannel = this.channels.find(ch=>ch.channel.id == channelId)
-    this.displayReady = Promise.resolve(true);
+
+  private createChListener(ch: Channel) {
+    var chListener = new ChannelListener();
+    chListener.channel = ch;
+    chListener.name = `channel.${ch.id}`;
+    chListener.listener = window.Echo.join(chListener.name);
+    chListener.channel.messages = new Subject<Message>()
+    chListener.channel.messagesLoadedEvent = new Subject<boolean>()
+
+    // Loading first page of messages
+    this.channelService.getMessages(ch).subscribe(data => {
+      chListener.channel._messages = data.success;
+      chListener.channel._messages.data.reverse();
+      chListener.channel.messagesLoadedEvent.next(true);
+      chListener.channel.displayReady = Promise.resolve(true);
+      chListener.channel.loadedMessages = true;
+    })
+
+    // Listen for new messages
+    chListener.listener.listen('.NewMessage', (data) => {
+      // Broadcast new message to subject
+      chListener.channel.messages.next(data.message);
+    })
+
+    // Retrieve new message from subject
+    chListener.channel.messages.subscribe((msg: any) => {
+      console.log("message recieved: " + msg.content)
+      //add message to front of array
+      chListener.channel._messages.data.push(msg);
+    })
+    return chListener;
+  }
+
+  selectChannel(channelId) {
+    if (this.loadedHappened) {
+      this.select(channelId)
+    }
+    else {
+      var handler = this.loaded.subscribe(data => {
+        handler.unsubscribe();
+        this.select(channelId)
+      })
+    }
+
+  }
+
+  private select(channelId) {
+    this.displayReady = Promise.resolve(false);
+    this.selectedChannel = null;
+    this.selectedChannel = this.channels.find(ch => ch.channel.id == channelId)
+
+    // Channel not joined
+    if (!this.selectedChannel) {
+      console.log("Loading from server")
+      this.channelService.getById(channelId).subscribe(data => {
+        this.selectedChannel = this.createChListener(data.success);
+        this.displayReady = Promise.resolve(true);
+        this.selected.next(true);
+      })
+    }
+    else {
+      this.displayReady = Promise.resolve(true);
+      this.selected.next(true);
+    }
   }
 }

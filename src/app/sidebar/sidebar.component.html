@@ -3,7 +3,7 @@
   style="border: none; border-right: 1px solid lightgray;"
 >
   <div class="card-header" style="height: 60px !important;">
-    <a href="/" class="text-dark">
+    <a [routerLink]="['/']" class="text-dark">
       <h5 class="pt-2">
         <b>
           Messenger
@@ -11,16 +11,25 @@
       </h5>
     </a>
   </div>
-  <ul class="list-group overflow-auto h-100">
-    <input type="text" id="search" class="list-group-item" (keyup)="this.search()" placeholder="Search for channel" style="border: none; border-radius: 0;">
+  <ul class="list-group overflow-auto h-100" *ngIf="this.sock.loaded | async">
+    <input
+      type="text"
+      id="search"
+      class="list-group-item bg-light"
+      (keyup)="this.search()"
+      placeholder="Search for channel"
+      style="border: none; border-radius: 0;"
+    />
     <a
-      *ngFor="let channel of channels"
-      [routerLink]="['/channel/'+channel.id]"
+      *ngFor="let channel of displayChannels"
+      [routerLink]="['/channel/' + channel.id]"
       class="list-group-item list-group-item-action"
-      [ngClass]="this.selectedChatId == channel.id ? 'disabled' : ''"
+      [ngClass]="this.selectedChatId == channel.id ? ['disabled','active'] : ''"
       >{{ channel.name }}</a
     >
   </ul>
+
+
   <div
     class="card-header d-flex justify-content-around"
     style="height: 70px !important;"

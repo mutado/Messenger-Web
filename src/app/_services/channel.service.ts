@@ -47,7 +47,6 @@ export class ChannelService {
     }
 
     search(querry: Channel) {
-        console.log(querry);
         return this.http.post<ApiResponse<Channel[]>>(`${environment.apiUrl}/channel/search`, querry);
     }
 }

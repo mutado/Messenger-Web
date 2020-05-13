@@ -44,7 +44,6 @@ export class ChannelComponent implements OnInit, OnDestroy {
 
 
   ngOnInit(): void {
-    console.log("init channel")
     this.loading = true;
     this.user = this.authenticationService.currentUserValue;
 
@@ -53,96 +52,64 @@ export class ChannelComponent implements OnInit, OnDestroy {
     });
 
     this.loading = true;
-    console.log(this.route.snapshot.params);
-    this.channel.id = +this.route.snapshot.params.channelId;
+    // subscribe for selected channel event
+    this.sock.selected.subscribe(() => {
+      // Check if user joined this channel
+      this.channelService.joined(this.sock.selectedChannel.channel).subscribe(data => {
+        if (data.success) {
+          this.joined = true;
+        }
+        else {
+          this.joined = false;
+        }
+      })
 
+      this.channel = this.socketService.selectedChannel.channel;
+      if (this.sock.selectedChannel.channel.loadedMessages) {
+        this.displayMessages();
+      } else {
+        this.sock.selectedChannel.channel.messagesLoadedEvent.subscribe(() => {
+          this.displayMessages();
+        })
+      }
+    })
+
+    // Subscribe for channel change event
     this.route.params.subscribe((params: Params) => {
-      console.log("Selected channel " + params['channelId']);
-      // if (this.socketService.loaded) {
-      //   this.loadChannel(params['channelId'])
-      // }
-      // else {
-      //   setTimeout(() => {
-      //   }, 200);
-      // }
-      // this.sock.loaded.subscribe((data)=>{
-      //   console.log("then")
-      //   // this.loadChannel(params['channelId']);
-      // })
-      this.socketService.loaded.subscribe(data => {
-        this.loadChannel(params['channelId']);
-      });
+      this.loadChannel(params['channelId']);
     })
+  }
 
-    // this.channelService.getById(this.channel.id).subscribe(ch => {
-    //   this.channel = ch.success;
-    //   this.socketService.SelectChannel(this.channel);
+  private displayMessages() {
+    console.log("display")
+    // retrieve data from socket
+    // this.messages = this.sock.currentChannelMessages.data;
+    this.page = this.sock.currentChannelMessages.current_page;
+    this.last_page = this.sock.currentChannelMessages.last_page;
 
-    //   // Load messages
-    //   console.log("Loading Messages");
-    //   this.channelService.getMessages(this.channel).subscribe(data => {
-    //     this.page = data.success.current_page;
-    //     this.last_page = data.success.last_page;
-    //     this.messages = data.success.data.reverse();
-    //     console.log("Loaded messages");
-    //     this.loading = true;
-
-    //     //Scroll to bottom
-    //     setTimeout(() => {
-    //       var msgbox = $('#message-box');
-    //       msgbox.scrollTop(msgbox.prop("scrollHeight"));
-    //     }, 1);
-    //   });
-
-    this.channelService.joined(this.channel).subscribe(data => {
-      if (data.success) {
-        this.joined = true;
-      }
-      else {
-        this.joined = false;
-      }
-    })
-
-    //   this.socketService.selectedJoinedChannel.channel.messages.subscribe(msg=>{
-    //     this.messages.push(msg);
-    //     this.scrollDown();
-    //   })
-
-
-
-    // })
+    // Display shit so fucking slow
+    // Needs to be done 1 ms after
+    setTimeout(() => {
+      $('#go-bottom-btn').click(this.scrollDown);
+      $('#message-box').scroll(this.scrollCheck.bind(this));
+      var msgbox = $('#message-box');
+      msgbox.scrollTop(msgbox.prop("scrollHeight"));
+    }, 1);
   }
 
   // Return current socket
-  // Shorthand alias or smth like
+  // Shorthand alias or smth like this
   get sock() {
     return this.socketService;
   }
 
+  // Return messages of this channel
   get msgs() {
     return this.sock.currentChannelMessages;
   }
 
   private loadChannel(channelId: number) {
-    this.socketService.selectChannel(channelId);
-    this.channel = this.socketService.selectedChannel.channel;
-    this.sock.selectedChannel.channel.loadedMessages.subscribe(data => {
-
-      // retrieve data from socket
-      // this.messages = this.sock.currentChannelMessages.data;
-      this.page = this.sock.currentChannelMessages.current_page;
-      this.last_page = this.sock.currentChannelMessages.last_page;
-
-      
-      // Display shit so fucking slow
-      // Needs to be done 1 ms after
-      setTimeout(() => {
-        $('#go-bottom-btn').click(this.scrollDown);
-        $('#message-box').scroll(this.scrollCheck.bind(this));
-        var msgbox = $('#message-box');
-        msgbox.scrollTop(msgbox.prop("scrollHeight"));
-      }, 1);
-    })
+    this.sock.selectChannel(channelId);
   }
 
   public scrollCheck() {
@@ -161,16 +128,24 @@ export class ChannelComponent implements OnInit, OnDestroy {
   appending: boolean = false;
   public appendMessages = () => {
     if (!this.appending && this.page != this.last_page) {
+      // Used to prevent multiple appendings in one time
       this.appending = true;
-      console.log("Loading page: " + (this.page + 1))
       this.channelService.getMessages(this.channel, this.page + 1).subscribe(data => {
+
+        // Get page data
         this.page = data.success.current_page;
         this.last_page = data.success.last_page;
+
         var msgbox = $('#message-box')
+
+        // Scrollbar save state
         var scrHeight = msgbox.prop("scrollHeight");
         var srcTop = msgbox.scrollTop();
-        this.messages = data.success.data.reverse().concat(this.messages);
+
+        // Append messages
+        this.msgs.data = data.success.data.reverse().concat(this.msgs.data)
         setTimeout(() => {
+          // Restore scrollbar position
           var hdiff = msgbox.prop("scrollHeight") - scrHeight;
           srcTop = msgbox.scrollTop();
           msgbox.scrollTop(hdiff + srcTop);
@@ -182,13 +157,12 @@ export class ChannelComponent implements OnInit, OnDestroy {
 
   join() {
     this.channelService.join(this.channel).subscribe(data => {
-      window.location.reload(false);
+      // window.location.reload(false);
     })
   }
 
   public scrollDown(speed = 'fast') {
     // Scroll to bottom
-    console.log("Scroll to bottom");
     var msgbox = $('#message-box');
     msgbox.animate({ scrollTop: msgbox.prop("scrollHeight") }, speed);
   }
