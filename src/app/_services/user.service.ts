@@ -20,4 +20,8 @@ export class UserService {
     search(user: User){
         return this.http.post<ApiResponse<User>>(`${environment.apiUrl}/user/search`,user);
     }
+
+    update(user:User){
+        return this.http.post<ApiResponse<User>>(`${environment.apiUrl}/user/update`,user);
+    }
 }

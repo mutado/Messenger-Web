@@ -25,11 +25,35 @@
       *ngFor="let channel of displayChannels"
       [routerLink]="['/channel/' + channel.id]"
       class="list-group-item list-group-item-action"
-      [ngClass]="this.selectedChatId == channel.id ? ['disabled','active'] : ''"
-      >{{ channel.name }}</a
+      [ngClass]="
+        this.selectedChatId == channel.id ? ['disabled', 'active'] : ''
+      "
     >
+      <div class="d-flex w-100 justify-content-between">
+        <h5 class="mb-1">{{ channel.name }}</h5>
+        <span *ngIf="(this.channel.displayReady | async)&&(this.channel._messages.data.length != 0)">
+          <small
+            class="text-muted"
+            *ngIf="
+              this.diffMessagesDatesInDays(lastMessage(channel)) > 0;
+              else todayProto
+            "
+            >{{ this.diffMessagesDatesInDays(lastMessage(channel)) }} days
+            ago</small
+          >
+          <ng-template #todayProto>
+            <small class="text-muted">today</small>
+          </ng-template>
+        </span>
+      </div>
+      <p class="mb-1" *ngIf="(this.channel.displayReady | async) && (this.channel._messages.data.length != 0)">
+        <span *ngIf="lastMessage(channel).userSender == this.user.id"
+          >You:</span
+        >
+        {{ lastMessage(channel).content }}
+      </p>
+    </a>
   </ul>
-
 
   <div
     class="card-header d-flex justify-content-around"

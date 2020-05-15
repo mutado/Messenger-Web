@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthenticationService } from '../_services/authentication.service';
 import { User } from '../_models/user';
+import { WebSocketService } from '../_services/web-socket.service';
 
 @Component({
   selector: 'app-profile',
@@ -13,7 +14,10 @@ export class ProfileComponent implements OnInit {
 
   constructor(
     private authenticationService: AuthenticationService,
-  ) { }
+    private socketService: WebSocketService,
+  ) {
+    this.socketService.selectedChannel = null;
+   }
 
   ngOnInit(): void {
     this.loading = true;

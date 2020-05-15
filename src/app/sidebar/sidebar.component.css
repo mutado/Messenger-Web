@@ -17,3 +17,7 @@
 .btn{
     padding: 2px !important;
 }
+
+.list-group-item.active small{
+    color: white !important;
+}

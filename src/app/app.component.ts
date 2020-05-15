@@ -34,7 +34,6 @@ export class AppComponent implements OnInit {
         private webSocketService : WebSocketService
     ) {
         this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
-        console.log("hell");
         // window.Echo = new Echo({
         //     broadcaster: 'socket.io',
         //     host: 'http://localhost:6001',

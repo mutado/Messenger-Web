@@ -7,7 +7,9 @@
         height="20px"
       />
     </a>
-    <h4 *ngIf="this.sock.displayReady | async">{{ this.sock.selectedChannel.channel.name }}</h4>
+    <h4 *ngIf="this.sock.displayReady | async">
+      {{ this.sock.selectedChannel.channel.name }}
+    </h4>
     <a href="channel/{{ this.channel.id }}/info">
       <img
         src="https://img.icons8.com/ios/50/000000/back--v1.png"
@@ -19,15 +21,32 @@
 
   <!-- Messages -->
   <div class="h-100 overflow-auto">
-    <div  *ngIf="(sock.displayReady | async) && (sock.selectedChannel.channel.displayReady | async)" class="h-100 overflow-auto" id="message-box">
-      <li 
-        *ngFor="let message of msgs.data"
-        class="message-bubble"
-        [ngClass]="this.message.userSender == this.user.id ? 'me' : 'him'"
-      >
-        {{ message.content }}
+    <ul
+      *ngIf="
+        (sock.displayReady | async) &&
+        (sock.selectedChannel.channel.displayReady | async)
+      "
+      class="h-100 overflow-auto d-flex flex-column"
+      id="message-box"
+    >
+      <li *ngFor="let message of msgs.data; let i = index">
+        <div>
+          <div *ngIf="this.isNewDay(msgs.data[i - 1], msgs.data[i])"
+          class="text-center new-day mt-5 text-muted">
+            {{message.created_at | date: "longDate"}}
+          </div>
+          <div
+            class="message-bubble"
+            [ngClass]="this.message.userSender == this.user.id ? 'me' : 'him'"
+          >
+            {{ message.content }}
+            <small style="font-size: 0.5rem;">
+              {{ message.created_at | date: "shortTime" }}
+            </small>
+          </div>
+        </div>
       </li>
-    </div>
+    </ul>
   </div>
 
   <!-- Input -->
@@ -37,8 +56,9 @@
     class="d-flex flex-row card-header"
     style="height: 70px !important;"
   >
-    <div *ngIf="this.joined;else other_content" class="input-group">
+    <div *ngIf="this.joined; else other_content" class="input-group">
       <input
+        autocomplete="off"
         type="text"
         placeholder="Write your message..."
         formControlName="message"

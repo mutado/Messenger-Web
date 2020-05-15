@@ -38,6 +38,7 @@ export class ChannelComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnDestroy(): void {
+    this.socketService.selectedChannel = null;
   }
 
 
@@ -53,14 +54,18 @@ export class ChannelComponent implements OnInit, OnDestroy {
     // subscribe for selected channel event
     this.sock.selected.subscribe(() => {
       // Check if user joined this channel
-      this.channelService.joined(this.sock.selectedChannel.channel).subscribe(data => {
-        if (data.success) {
-          this.joined = true;
-        }
-        else {
-          this.joined = false;
-        }
-      })
+      if (this.sock.channels.find(ch => ch.channel.id == this.sock.selectedChannel.channel.id))
+        this.joined = true;
+      else
+        this.joined = false;
+      // this.channelService.joined(this.sock.selectedChannel.channel).subscribe(data => {
+      //   if (data.success) {
+      //     this.joined = true;
+      //   }
+      //   else {
+      //     this.joined = false;
+      //   }
+      // })
 
       this.channel = this.socketService.selectedChannel.channel;
       if (this.sock.selectedChannel.channel.loadedMessages) {
@@ -82,9 +87,9 @@ export class ChannelComponent implements OnInit, OnDestroy {
     console.log("display")
     // retrieve data from socket
     // this.messages = this.sock.currentChannelMessages.data;
-    console.log("current page "+this.msgs.current_page)
+    console.log("current page " + this.msgs.current_page)
 
-    if (this.msgs.data.length<50){
+    if (this.msgs.data.length < 50) {
       this.appendMessages();
     }
 
@@ -127,6 +132,20 @@ export class ChannelComponent implements OnInit, OnDestroy {
     }
   }
 
+  getMessageTime(msg:Message){
+    console.log("l")
+    return new Date(msg.created_at).toLocaleTimeString();
+  }
+
+  isNewDay(prevMsg:Message,currMsg:Message){
+    if (prevMsg){
+      var dt1 = new Date(prevMsg.created_at);
+      var dt2 = new Date(currMsg.created_at);
+      return dt1.getDay() != dt2.getDay();
+    }
+    return true;
+  }
+
   appending: boolean = false;
   public appendMessages = () => {
     if (!this.appending && this.msgs.current_page != 1) {
@@ -160,7 +179,7 @@ export class ChannelComponent implements OnInit, OnDestroy {
 
   join() {
     this.channelService.join(this.channel).subscribe(data => {
-      // window.location.reload(false);
+      this.joined = true;
     })
   }
 

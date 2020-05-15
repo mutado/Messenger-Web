@@ -8,6 +8,7 @@ export class Message {
     recieved:number;
     seen:boolean;
     send_at:number;
+    created_at:number;
 
     constructor(
         content:string,
@@ -22,4 +23,10 @@ export class Message {
         this.channelId = channelId;
         this.seen = seen;
     }
+
+    getTimeString(){
+        console.log("lmao")
+        return new Date(this.created_at).toLocaleTimeString();
+    }
+
 }

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Contact } from '../_models/contact';
+import { WebSocketService } from '../_services/web-socket.service';
 
 @Component({
   selector: 'app-add-contact',
@@ -11,9 +12,11 @@ export class AddContactComponent implements OnInit {
   contactForm: FormGroup;
   submitted: boolean;
   loading: boolean;
+
   constructor(
     private formBuilder: FormBuilder,
-  ) { }
+  ) { 
+  }
 
   ngOnInit(): void {
     this.contactForm = this.formBuilder.group({

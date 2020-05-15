@@ -1,0 +1,11 @@
+.btn-save{
+    opacity: 1;
+    transition: ease-in 0.1s;
+}
+.btn-save.hidden{
+    opacity: 0 !important;
+}
+
+input{
+    transition: ease-in 0.1s !important;
+}
