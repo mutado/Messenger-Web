@@ -9,6 +9,7 @@ import { User } from '../_models/user';
 import { AuthenticationService } from '../_services/authentication.service';
 import { WebSocketService } from '../_services/web-socket.service';
 import { async } from '@angular/core/testing';
+import { Subscription } from 'rxjs';
 
 declare var $: any;
 
@@ -41,8 +42,11 @@ export class ChannelComponent implements OnInit, OnDestroy {
     this.socketService.selectedChannel = null;
   }
 
+  msgListener: Subscription;
+
 
   ngOnInit(): void {
+
     this.loading = true;
     this.user = this.authenticationService.currentUserValue;
 
@@ -67,6 +71,15 @@ export class ChannelComponent implements OnInit, OnDestroy {
       //   }
       // })
 
+      this.msgListener = this.sock.selectedChannel.channel.messages.subscribe(data => {
+        console.log(this.socketService.selectedChannel.channel.name)
+        // Check if scrollbar is on bottom
+        if ($('#message-box').scrollTop() > $('#message-box').prop("scrollHeight") - $('#message-box').prop("offsetHeight") - 100) {
+          // Bottom
+          this.scrollDown('slow');
+        }
+      })
+
       this.channel = this.socketService.selectedChannel.channel;
       if (this.sock.selectedChannel.channel.loadedMessages) {
         this.displayMessages();
@@ -79,6 +92,8 @@ export class ChannelComponent implements OnInit, OnDestroy {
 
     // Subscribe for channel change event
     this.route.params.subscribe((params: Params) => {
+      if (this.msgListener)
+        this.msgListener.unsubscribe();
       this.loadChannel(params['channelId']);
     })
   }
@@ -88,7 +103,6 @@ export class ChannelComponent implements OnInit, OnDestroy {
     // retrieve data from socket
     // this.messages = this.sock.currentChannelMessages.data;
     console.log("current page " + this.msgs.current_page)
-
     if (this.msgs.data.length < 50) {
       this.appendMessages();
     }
@@ -119,7 +133,12 @@ export class ChannelComponent implements OnInit, OnDestroy {
     this.sock.selectChannel(channelId);
   }
 
+  scrollWainting = false;
   public scrollCheck() {
+    if (this.scrollWainting  == true)
+      return;
+    this.scrollWainting = true;
+
     if ($('#message-box').scrollTop() > $('#message-box').prop("scrollHeight") - $('#message-box').prop("offsetHeight") - 100) {
       // Bottom
       $('#go-bottom-btn').addClass('hidden')
@@ -130,15 +149,19 @@ export class ChannelComponent implements OnInit, OnDestroy {
       // Show button
       $('#go-bottom-btn').removeClass('hidden')
     }
+
+    setTimeout(() => {
+      this.scrollWainting = false;
+    }, 100);
   }
 
-  getMessageTime(msg:Message){
+  getMessageTime(msg: Message) {
     console.log("l")
     return new Date(msg.created_at).toLocaleTimeString();
   }
 
-  isNewDay(prevMsg:Message,currMsg:Message){
-    if (prevMsg){
+  isNewDay(prevMsg: Message, currMsg: Message) {
+    if (prevMsg) {
       var dt1 = new Date(prevMsg.created_at);
       var dt2 = new Date(currMsg.created_at);
       return dt1.getDay() != dt2.getDay();
@@ -162,15 +185,21 @@ export class ChannelComponent implements OnInit, OnDestroy {
 
         // Scrollbar save state
         var scrHeight = msgbox.prop("scrollHeight");
-        var srcTop = msgbox.scrollTop();
+        var srcTop = document.getElementById('message-box').scrollTop;
 
+        console.log("scrTop: "+srcTop);
+        console.log("height: "+scrHeight);
+ 
         // Append messages
         this.msgs.data = data.success.data.concat(this.msgs.data)
         setTimeout(() => {
           // Restore scrollbar position
           var hdiff = msgbox.prop("scrollHeight") - scrHeight;
           srcTop = msgbox.scrollTop();
+          console.log("new height: "+msgbox.prop("scrollHeight"));
+          console.log(hdiff + srcTop)
           msgbox.scrollTop(hdiff + srcTop);
+          // document.getElementById('message-box').scrollBy(0,hdiff + srcTop);
           this.appending = false;
         }, 1);
       })
@@ -180,31 +209,42 @@ export class ChannelComponent implements OnInit, OnDestroy {
   join() {
     this.channelService.join(this.channel).subscribe(data => {
       this.joined = true;
+      this.sock.addChannel(this.sock.selectedChannel);
+      this.loadChannel(this.channel.id);
+      this.sendMessage("joined this channel","service")
+      console.log(this.sock.channels)
     })
   }
 
   public scrollDown(speed = 'fast') {
     // Scroll to bottom
     var msgbox = $('#message-box');
-    msgbox.animate({ scrollTop: msgbox.prop("scrollHeight") }, speed);
+    msgbox.finish();
+    setTimeout(() => {
+      msgbox.animate({ scrollTop: msgbox.prop("scrollHeight") }, speed);
+    }, 1);
   }
 
   get f() { return this.sendMessageForm.controls; }
 
   onSubmit() {
     if (this.sendMessageForm.invalid) {
-      console.log(this.sendMessageForm.errors);
       return;
     }
     this.sending = true;
 
+    this.sendMessage(this.f.message.value);
+
+  }
+
+  sendMessage(content:string,type="message"){
     var message = new Message(
-      this.f.message.value,
+      content,
       this.user.id,
       this.channel.id,
-      Date.now(),
       false
     )
+    message.type = type;
 
     // console.log(message);
     this.messageService.sendMessage(message).subscribe(response => {
@@ -212,7 +252,6 @@ export class ChannelComponent implements OnInit, OnDestroy {
       this.sending = false;
       this.scrollDown('slow');
     })
-
   }
 
 }

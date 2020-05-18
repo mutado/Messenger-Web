@@ -24,14 +24,19 @@
     <a
       *ngFor="let channel of displayChannels"
       [routerLink]="['/channel/' + channel.id]"
-      class="list-group-item list-group-item-action"
+      class="list-group-item list-group-item-action channel-tab"
       [ngClass]="
         this.selectedChatId == channel.id ? ['disabled', 'active'] : ''
       "
     >
       <div class="d-flex w-100 justify-content-between">
         <h5 class="mb-1">{{ channel.name }}</h5>
-        <span *ngIf="(this.channel.displayReady | async)&&(this.channel._messages.data.length != 0)">
+        <span
+          *ngIf="
+            (this.channel.displayReady | async) &&
+            this.channel._messages.data.length != 0
+          "
+        >
           <small
             class="text-muted"
             *ngIf="
@@ -46,7 +51,13 @@
           </ng-template>
         </span>
       </div>
-      <p class="mb-1" *ngIf="(this.channel.displayReady | async) && (this.channel._messages.data.length != 0)">
+      <p
+        class="mb-1"
+        *ngIf="
+          (this.channel.displayReady | async) &&
+          this.channel._messages.data.length != 0
+        "
+      >
         <span *ngIf="lastMessage(channel).userSender == this.user.id"
           >You:</span
         >

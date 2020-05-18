@@ -11,8 +11,12 @@
 
 <!-- main app container -->
 <div class="d-flex h-100">
-  <app-sidebar class="flex-shrink-1 bd-highlight" *ngIf="currentUser"></app-sidebar>
-    <div class="flex-fill h-100 overflow-hidden">
-        <router-outlet class=""></router-outlet>
-    </div>
+  <app-sidebar
+    class="sidebar"
+    class="flex-shrink-1 bd-highlight"
+    *ngIf="currentUser"
+  ></app-sidebar>
+  <div class="flex-fill h-100 overflow-hidden">
+    <router-outlet class=""></router-outlet>
+  </div>
 </div>

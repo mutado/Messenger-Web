@@ -1,7 +1,7 @@
 <div class="card h-100 rounded-0" style="border: none;">
   <!-- Header -->
   <div class="card-header d-flex justify-content-between align-items-center">
-    <a href="/">
+    <a routerLink="/">
       <img
         src="https://img.icons8.com/ios/50/000000/back--v1.png"
         height="20px"
@@ -10,7 +10,7 @@
     <h4 *ngIf="this.sock.displayReady | async">
       {{ this.sock.selectedChannel.channel.name }}
     </h4>
-    <a href="channel/{{ this.channel.id }}/info">
+    <a [routerLink]="['/channel/info',this.channel.id]">
       <img
         src="https://img.icons8.com/ios/50/000000/back--v1.png"
         height="20px"
@@ -30,7 +30,7 @@
       id="message-box"
     >
       <li *ngFor="let message of msgs.data; let i = index">
-        <div>
+        <div *ngIf="message.type =='message';else service_message">
           <div *ngIf="this.isNewDay(msgs.data[i - 1], msgs.data[i])"
           class="text-center new-day mt-5 text-muted">
             {{message.created_at | date: "longDate"}}
@@ -45,6 +45,11 @@
             </small>
           </div>
         </div>
+        <ng-template #service_message class="">
+          <div class="d-flex justify-content-center">
+            <div class="text-center service-message rounded-pill">{{message.content}}</div>
+          </div>
+        </ng-template>
       </li>
     </ul>
   </div>

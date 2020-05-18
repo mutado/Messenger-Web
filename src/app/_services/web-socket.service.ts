@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import * as io from "socket.io-client";
 import { Observable, BehaviorSubject, Subject } from 'rxjs';
 import { AuthenticationService } from './authentication.service';
@@ -12,7 +12,7 @@ import { resolve } from 'dns';
 @Injectable({
   providedIn: 'root'
 })
-export class WebSocketService {
+export class WebSocketService implements OnDestroy {
   readonly uri = "localhost:6001";
   public selectedChannel: ChannelListener;
   public channels = [new ChannelListener()];
@@ -21,6 +21,7 @@ export class WebSocketService {
   public loadedHappened = false;
   public displayReady: Promise<boolean>;
   public selected = new Subject<boolean>();
+  public channelsChanged = new Subject<boolean>();
 
   get currentChannelMessages() {
     try {
@@ -37,6 +38,11 @@ export class WebSocketService {
       this.connect();
     }
   }
+  ngOnDestroy(): void {
+    this.disconnect();
+  }
+
+
 
   /**
    * Connect to socket
@@ -116,13 +122,17 @@ export class WebSocketService {
     this.loadedHappened = true;
   }
 
-  private createChListener(ch: Channel) {
+  createChListener(ch: Channel) {
     var chListener = new ChannelListener();
     chListener.channel = ch;
     chListener.name = `channel.${ch.id}`;
     chListener.listener = window.Echo.join(chListener.name);
     chListener.channel.messages = new Subject<Message>()
     chListener.channel.messagesLoadedEvent = new Subject<boolean>()
+
+    chListener.listener.here(users => {
+      console.log(users);
+    })
 
     // Loading first page of messages
     this.channelService.getMessages(ch).subscribe(data => {
@@ -149,6 +159,7 @@ export class WebSocketService {
 
   selectChannel(channelId) {
     if (this.loadedHappened) {
+      console.log(this.channels)
       this.select(channelId)
     }
     else {
@@ -158,6 +169,18 @@ export class WebSocketService {
       })
     }
 
+  }
+
+  addChannel(channel: ChannelListener) {
+    this.channels.push(channel);
+    this.channelsChanged.next(true);
+  }
+
+  removeChannel(channelId: number) {
+    var index = this.channels.indexOf(this.channels.find(ch => ch.channel.id == channelId))
+    if (index > -1)
+      this.channels.splice(index, 1);
+    this.channelsChanged.next(true);
   }
 
   private select(channelId) {

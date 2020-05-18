@@ -34,6 +34,9 @@ export class ChannelService {
     join(channel: Channel) {
         return this.http.get(`${environment.apiUrl}/channel/join/${channel.id}`);
     }
+    leave(channelId: number) {
+        return this.http.get<ApiResponse<string>>(`${environment.apiUrl}/channel/leave/${channelId}`);
+    }
     joined(channel: Channel) {
         return this.http.get<ApiResponse<string>>(`${environment.apiUrl}/channel/joined/${channel.id}`);
     }

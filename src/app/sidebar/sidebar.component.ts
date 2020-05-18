@@ -31,6 +31,12 @@ export class SidebarComponent implements OnInit {
     private authenticationService: AuthenticationService
   ) {
     this.user = this.authenticationService.currentUserValue;
+
+    this.socketService.channelsChanged.subscribe(data=>{
+      this.displayChannels = this.allChannels;
+      console.log("changed");
+      $('#search').val("")
+    })
   }
 
   get sock() {
@@ -49,7 +55,7 @@ export class SidebarComponent implements OnInit {
     return channel._messages.data[channel._messages.data.length - 1];
   }
 
-  diffMessagesDatesInDays(msg1:Message) {
+  diffMessagesDatesInDays(msg1: Message) {
     const date1 = new Date(msg1.created_at);
     const date2 = new Date();
     var Difference_In_Time = Math.abs(date2.getTime() - date1.getTime());
@@ -70,21 +76,28 @@ export class SidebarComponent implements OnInit {
     this.displayChannels = <Channel[]>[];
     var searchInput = $('#search').val()
 
-    if (searchInput.charAt(0) == "@") {
-      console.log("user find")
+    // Nothing to search
+    // Display all
+    if (searchInput === "") {
+      this.displayChannels = this.allChannels;
     }
     else {
-      this.allChannels.map(ch => {
-        if (ch.name.includes($('#search').val()))
-          return ch;
-      })
-      var ch = new Channel();
-      ch.name = searchInput;
-      this.channelService.search(ch).subscribe(data => {
-        // this.displayChannels = this.allChannels.concat(data.success);
-        var ids = new Set(this.displayChannels.map(d => d.id));
-        this.displayChannels = [...this.displayChannels, ...data.success.filter(d => !ids.has(d.id))];
-      })
+      if (searchInput.charAt(0) == "@") {
+        console.log("user find")
+      }
+      else {
+        this.allChannels.map(ch => {
+          if (ch.name.includes($('#search').val()))
+            return ch;
+        })
+        var ch = new Channel();
+        ch.name = searchInput;
+        this.channelService.search(ch).subscribe(data => {
+          // this.displayChannels = this.allChannels.concat(data.success);
+          var ids = new Set(this.displayChannels.map(d => d.id));
+          this.displayChannels = [...this.displayChannels, ...data.success.filter(d => !ids.has(d.id))];
+        })
+      }
     }
   }
 }

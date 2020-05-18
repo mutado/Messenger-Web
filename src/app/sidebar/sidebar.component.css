@@ -1,23 +1,30 @@
-.card ul{
-    /* max-height: 100%; */
-    overflow-y:scroll;
-    -webkit-overflow-scrolling: touch;
+.card ul {
+  /* max-height: 100%; */
+  overflow-y: scroll;
+  -webkit-overflow-scrolling: touch;
 }
 
-.card ul a{
-    border-radius: 0 !important;
-    border-right: none;
-    border-left: none;
+.card ul a {
+  border-radius: 0 !important;
+  border-right: none;
+  border-left: none;
 }
 
-.card{
-    height: 100%;
+.card {
+  height: 100%;
 }
 
-.btn{
-    padding: 2px !important;
+.btn {
+  padding: 2px !important;
 }
 
-.list-group-item.active small{
-    color: white !important;
+.list-group-item.active small {
+  color: white !important;
+}
+
+.channel-tab p {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
 }

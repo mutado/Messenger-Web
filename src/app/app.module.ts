@@ -23,6 +23,9 @@ import { SidebarComponent } from './sidebar/sidebar.component';
 import { MessagesComponent } from './messages/messages.component';
 import { SettingsComponent } from './settings/settings.component';
 import { AddContactComponent } from './add-contact/add-contact.component';
+import { ChannelInfoComponent } from './channel-info/channel-info.component';
+import { RegisterComponent } from './register/register.component';
+import { TermsComponent } from './terms/terms.component';
 // import { EchoService, ECHO_CONFIG, SocketIoEchoConfig } from 'angular-laravel-echo';
 
 
@@ -48,6 +51,9 @@ import { AddContactComponent } from './add-contact/add-contact.component';
     MessagesComponent,
     SettingsComponent,
     AddContactComponent,
+    ChannelInfoComponent,
+    RegisterComponent,
+    TermsComponent,
   ],
   imports: [
     BrowserModule,

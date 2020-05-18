@@ -1,3 +1,7 @@
 app-sidebar{
     width: 25%;
 }
+
+@media (max-width: 1000px) {
+
+}

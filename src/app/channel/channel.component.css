@@ -59,3 +59,9 @@ ul {
 #go-bottom-btn.hidden {
   right: -50px;
 }
+
+.service-message{
+  padding: 1px 20px;
+  background-color: rgba(211, 211, 211, 0.5);
+  margin: 2px;
+}

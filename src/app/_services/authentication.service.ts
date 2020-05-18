@@ -5,6 +5,7 @@ import { map, catchError } from 'rxjs/operators';
 
 import { environment } from 'src/environments/environment';
 import { User } from '../_models/user';
+import { ApiResponse } from '../_models/apiresponse';
 
 @Injectable({ providedIn: 'root' })
 export class AuthenticationService {
@@ -37,6 +38,10 @@ export class AuthenticationService {
 
     getStatus(){
         return this.http.get(`${environment.apiUrl}/status`);
+    }
+
+    register(user:any){
+        return this.http.post<ApiResponse<any>>(`${environment.apiUrl}/register`,user)
     }
 
     logout() {

@@ -5,19 +5,16 @@ export class Message {
     content: string;
     userSender:number;
     channelId:number;
-    recieved:number;
     seen:boolean;
-    send_at:number;
     created_at:number;
+    type="message";
 
     constructor(
         content:string,
         userSender:number,
         channelId:number,
-        send_at:number,
         seen:boolean)
     {
-        this.send_at = send_at;
         this.content = content;
         this.userSender=userSender;
         this.channelId = channelId;

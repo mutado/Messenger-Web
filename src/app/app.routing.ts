@@ -10,6 +10,9 @@ import { ChannelCreateComponent } from './channel-create/channel-create.componen
 import { ChannelComponent } from './channel/channel.component';
 import { SettingsComponent } from './settings/settings.component';
 import { AddContactComponent } from './add-contact/add-contact.component';
+import { ChannelInfoComponent } from './channel-info/channel-info.component';
+import { RegisterComponent } from './register/register.component';
+import { TermsComponent } from './terms/terms.component';
 
 const routes: Routes = [
     {
@@ -28,6 +31,14 @@ const routes: Routes = [
         component: LoginComponent
     },
     {
+        path: 'terms',
+        component: TermsComponent
+    },
+    {
+        path: 'register',
+        component: RegisterComponent
+    },
+    {
         path: 'profile',
         component: ProfileComponent
     },
@@ -38,6 +49,11 @@ const routes: Routes = [
     {
         path: 'channel/:channelId',
         component: ChannelComponent,
+        canActivate: [AuthGuard],
+    },
+    {
+        path: 'channel/info/:channelId',
+        component: ChannelInfoComponent,
         canActivate: [AuthGuard],
     },
     {

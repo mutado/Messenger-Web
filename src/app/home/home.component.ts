@@ -31,12 +31,4 @@ export class HomeComponent implements OnInit {
 
   ngOnInit() {
   }
-
-  sendTestMessage(){
-    console.log("sending test message");
-    var mes = new Message('test message',1,1,1,false);
-    this.messageService.sendMessage(mes).subscribe(mes=>{
-      console.log(mes);
-    })
-  }
 }
