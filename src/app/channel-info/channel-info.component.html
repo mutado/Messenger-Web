@@ -1,2 +1,31 @@
-<p>channel-info works!</p>
-<button class="btn btn-danger btn-block" (click)="leave()">Leave</button>
+<div class="card-header d-flex justify-content-between align-items-center" style="height: 65px;">
+  <a [routerLink]="['/channel',this.channelId]">
+    <img
+      src="https://img.icons8.com/ios/50/000000/back--v1.png"
+      height="20px"
+    />
+  </a>
+</div>
+<div id="channel-info" class="jumbotron jumbotron-fluid">
+  <div class="container" *ngIf="this.sock.displayReady | async">
+    <div
+      class="d-flex justify-content-between flex-column"
+      *ngIf="this.currentChannel"
+    >
+      <h2 class="align-self-center">{{ this.currentChannel.channel.name }}</h2>
+    </div>
+
+    <div class="list-group">
+      <a
+        *ngFor="let user of this.membersOnline"
+        class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+      >
+        {{ user.name }}
+        <small class="text-primary">online</small>
+      </a>
+    </div>
+    <button class="btn btn-danger btn-block mt-5" (click)="leave()">
+      Leave
+    </button>
+  </div>
+</div>

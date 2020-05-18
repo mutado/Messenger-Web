@@ -8,6 +8,7 @@ export class Message {
     seen:boolean;
     created_at:number;
     type="message";
+    user:User;
 
     constructor(
         content:string,

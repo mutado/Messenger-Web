@@ -7,10 +7,25 @@
         height="20px"
       />
     </a>
-    <h4 *ngIf="this.sock.displayReady | async">
-      {{ this.sock.selectedChannel.channel.name }}
-    </h4>
-    <a [routerLink]="['/channel/info',this.channel.id]">
+    <div
+      *ngIf="this.sock.displayReady | async"
+      class="d-flex flex-column align-items-center"
+    >
+      <h4>
+        {{ this.sock.selectedChannel.channel.name }}
+      </h4>
+      <span
+        *ngIf="this.sock.selectedChannel.channel.typing === null; else typing"
+        class="text-primary"
+      >
+        {{ this.sock.selectedChannel.membersOnline.length }} online
+      </span>
+      <ng-template #typing
+        >{{ this.sock.selectedChannel.channel.typing }} is
+        typing...</ng-template
+      >
+    </div>
+    <a [routerLink]="['/channel/info', this.channel.id]">
       <img
         src="https://img.icons8.com/ios/50/000000/back--v1.png"
         height="20px"
@@ -30,15 +45,18 @@
       id="message-box"
     >
       <li *ngFor="let message of msgs.data; let i = index">
-        <div *ngIf="message.type =='message';else service_message">
-          <div *ngIf="this.isNewDay(msgs.data[i - 1], msgs.data[i])"
-          class="text-center new-day mt-5 text-muted">
-            {{message.created_at | date: "longDate"}}
+        <div *ngIf="message.type == 'message'; else service_message">
+          <div
+            *ngIf="this.isNewDay(msgs.data[i - 1], msgs.data[i])"
+            class="text-center mt-5 text-muted"
+          >
+            {{ message.created_at | date: "longDate" }}
           </div>
           <div
-            class="message-bubble"
-            [ngClass]="this.message.userSender == this.user.id ? 'me' : 'him'"
+            class="message-bubble position-relative"
+            [ngClass]="[this.message.userSender == this.user.id ? 'me' : 'him',isOtherUser(msgs.data[i - 1], msgs.data[i])?'other-user':'']"
           >
+          <small *ngIf="isOtherUser(msgs.data[i - 1], msgs.data[i])" class="text-nowrap position-absolute text-dark" style="top: -20px;">{{ message.user.name }}</small>
             {{ message.content }}
             <small style="font-size: 0.5rem;">
               {{ message.created_at | date: "shortTime" }}
@@ -47,7 +65,9 @@
         </div>
         <ng-template #service_message class="">
           <div class="d-flex justify-content-center">
-            <div class="text-center service-message rounded-pill">{{message.content}}</div>
+            <div class="text-center service-message rounded-pill">
+              {{ message.content }}
+            </div>
           </div>
         </ng-template>
       </li>
@@ -63,6 +83,7 @@
   >
     <div *ngIf="this.joined; else other_content" class="input-group">
       <input
+        (keyup)="this.typing()"
         autocomplete="off"
         type="text"
         placeholder="Write your message..."

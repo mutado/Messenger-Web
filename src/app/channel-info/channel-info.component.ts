@@ -6,6 +6,7 @@ import { AuthenticationService } from '../_services/authentication.service';
 import { User } from '../_models/user';
 import { MessageService } from '../_services/message.service';
 import { Message } from '../_models/message';
+import { ChannelListener } from '../_models/apiresponse';
 
 @Component({
   selector: 'app-channel-info',
@@ -35,21 +36,37 @@ export class ChannelInfoComponent implements OnInit, OnDestroy {
     this.socketService.selectChannel(this.channelId)
   }
 
+  get sock(){
+    return this.socketService;
+  }
+
+  get currentChannel(){
+    return this.socketService.selectedChannel;
+  }
+
+  get membersOnline(){
+    return this.socketService.selectedChannel.membersOnline;
+  }
+
+  get members(){
+    return this.socketService.selectedChannel.members;
+  }
+
   ngOnDestroy(){
     this.socketService.selectedChannel = null;
   }
 
   leave() {
-    var message = new Message(
-      "left this channel",
-      this.user.id,
-      this.channelId,
-      false
-    )
-    message.type = "service";
-    this.messageService.sendMessage(message).subscribe(data => {
-      console.log(data);
-    })
+    // var message = new Message(
+    //   "left this channel",
+    //   this.user.id,
+    //   this.channelId,
+    //   false
+    // )
+    // message.type = "service";
+    // this.messageService.sendMessage(message).subscribe(data => {
+    //   console.log(data);
+    // })
 
     this.socketService.removeChannel(this.channelId);
 

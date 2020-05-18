@@ -37,6 +37,10 @@ ul {
   border-bottom-right-radius: 5px;
 }
 
+.other-user{
+  margin-top: 30px;
+}
+
 #go-bottom-btn {
   position: fixed !important;
   bottom: 75px !important;

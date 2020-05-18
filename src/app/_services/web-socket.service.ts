@@ -30,6 +30,9 @@ export class WebSocketService implements OnDestroy {
     catch (e) { return null }
   }
 
+  audio = new Audio('https://notificationsounds.com/message-tones/juntos-607/download/mp3');
+
+
   constructor(
     private authenticationService: AuthenticationService,
     private channelService: ChannelService
@@ -70,32 +73,6 @@ export class WebSocketService implements OnDestroy {
     } catch (error) {
       console.log("Error connecting to socket: " + error.message);
     }
-
-
-    // this.channelService.getUsersChannels().subscribe(data => {
-    //   data.success.forEach(element => {
-
-    //     window.Echo.join(`channel.${element.id}`)
-    //       .here((users) => {
-    //         console.log(users);
-    //       })
-    //       .listen('.NewMessage', (data) => {
-    //         // this.channelService.channels.subscribe(data=>{
-    //         //   var msg = new Message('hell yeah',1,1,10,false);
-    //         //   data.success.find(element=>element.id == msg.channelId).messages.subscribe(messages=>messages.success.data.push(msg));
-    //         // })
-
-    //         this.channelService.channels.subscribe(data=>{
-    //           console.log("data");
-    //           console.log(data);
-    //           var chan = data.success.find(element=>element.id == 1)
-    //           console.log(chan.messages);
-    //           chan.messages.subscribe(messages=>console.log(messages));
-
-    //         })
-    //       })
-    //   });
-    // })
   }
 
   /**
@@ -129,10 +106,47 @@ export class WebSocketService implements OnDestroy {
     chListener.listener = window.Echo.join(chListener.name);
     chListener.channel.messages = new Subject<Message>()
     chListener.channel.messagesLoadedEvent = new Subject<boolean>()
+    chListener.channel.typing = null;
+    chListener.channel.typingHandler = null;
 
     chListener.listener.here(users => {
-      console.log(users);
+      chListener.membersOnline = users;
     })
+      .joining(user => {
+        chListener.membersOnline.push(user);
+      })
+      .leaving(user => {
+        var index = chListener.membersOnline.indexOf(chListener.membersOnline.find(u => u.id == user.id));
+        if (index > -1)
+          chListener.membersOnline.splice(index, 1);
+      })
+      .listen('.MemberJoined', (data) => {
+        chListener.members.push(data.user);
+      })
+      .listen('.MemberLeft', (data) => {
+        var index = chListener.members.indexOf(chListener.members.find(u => u.id == data.user.id));
+        if (index > -1)
+          chListener.members.splice(index, 1);
+      })
+      .listen('.NewMessage', (data) => {
+        // Broadcast new message to subject
+        this.audio.pause();
+        this.audio.currentTime = 0;
+        this.audio.play();
+        console.log(data);
+        chListener.channel.messages.next(data.message);
+      })
+      .listenForWhisper('typing', (e) => {
+        if (chListener.channel.typingHandler)
+          clearTimeout(chListener.channel.typingHandler);
+        console.log(e);
+        chListener.channel.typingHandler = setTimeout(() => {
+          chListener.channel.typing = null;
+        }, 1000);
+
+        chListener.channel.typing = e.name;
+      });
+
 
     // Loading first page of messages
     this.channelService.getMessages(ch).subscribe(data => {
@@ -142,10 +156,8 @@ export class WebSocketService implements OnDestroy {
       chListener.channel.loadedMessages = true;
     })
 
-    // Listen for new messages
-    chListener.listener.listen('.NewMessage', (data) => {
-      // Broadcast new message to subject
-      chListener.channel.messages.next(data.message);
+    this.channelService.getMembers(ch.id).subscribe(data => {
+      chListener.members = data.success;
     })
 
     // Retrieve new message from subject
@@ -169,6 +181,12 @@ export class WebSocketService implements OnDestroy {
       })
     }
 
+  }
+
+  refreshMessages() {
+    this.channelService.getMessages(this.selectedChannel.channel).subscribe(data => {
+      this.selectedChannel.channel._messages = data.success;
+    })
   }
 
   addChannel(channel: ChannelListener) {

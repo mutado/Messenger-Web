@@ -30,6 +30,10 @@ export class ChannelService {
         return this.http.get<ApiResponse<Channel[]>>(`${environment.apiUrl}/user/channels`);
     }
 
+    getMembers(channelId:number){
+        return this.http.get<ApiResponse<User[]>>(`${environment.apiUrl}/channel/${channelId}/members`);
+    }
+
 
     join(channel: Channel) {
         return this.http.get(`${environment.apiUrl}/channel/join/${channel.id}`);

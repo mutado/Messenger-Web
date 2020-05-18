@@ -43,6 +43,13 @@ export class SidebarComponent implements OnInit {
     return this.socketService;
   }
 
+  get loadingType(){
+    if (!this.sock.loadedHappened)
+      return "Connecting..."
+    else
+      return "Messenger"
+  }
+
   ngOnInit(): void {
     this.socketService.loaded.subscribe(ch => {
       // this.allChannels = this.socketService.channels.map(chl=>chl.channel);

@@ -9,3 +9,7 @@
 input{
     transition: ease-in 0.1s !important;
 }
+
+#settings{
+    height: 100%;
+}

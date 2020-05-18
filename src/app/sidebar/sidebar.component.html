@@ -2,16 +2,23 @@
   class="card rounded-0"
   style="border: none; border-right: 1px solid lightgray;"
 >
-  <div class="card-header" style="height: 60px !important;">
-    <a [routerLink]="['/']" class="text-dark">
-      <h5 class="pt-2">
-        <b>
-          Messenger
-        </b>
-      </h5>
-    </a>
-  </div>
+  <!-- Heading -->
+  <!-- <div class="card-header" style="height: 60px !important;"> -->
+
+  <a
+    [routerLink]="['/']"
+    class="text-dark card-header"
+    style="height: 60px !important;"
+  >
+    <h5 class="pt-2">
+      <b>
+        {{ loadingType }}
+      </b>
+    </h5>
+  </a>
+  <!-- </div> -->
   <ul class="list-group overflow-auto h-100">
+    <!-- Search bar -->
     <input
       type="text"
       id="search"
@@ -21,6 +28,8 @@
       style="border: none; border-radius: 0;"
       autocomplete="off"
     />
+
+    <!-- Channel item -->
     <a
       *ngFor="let channel of displayChannels"
       [routerLink]="['/channel/' + channel.id]"
@@ -58,14 +67,32 @@
           this.channel._messages.data.length != 0
         "
       >
-        <span *ngIf="lastMessage(channel).userSender == this.user.id"
-          >You:</span
-        >
-        {{ lastMessage(channel).content }}
+        <!-- Noone typing -->
+        <span *ngIf="channel.typing === null; else typing">
+          <!-- You send message -->
+
+          <span *ngIf="lastMessage(channel).type == 'message'">
+            <span
+              *ngIf="
+                lastMessage(channel).user.id == this.user.id;
+                else otheruser
+              "
+              >You:</span
+            >
+
+            <!-- Ohter send message -->
+            <ng-template #otheruser
+              >{{ lastMessage(channel).user.name }}:</ng-template
+            >
+          </span>
+          {{ lastMessage(channel).content }}
+        </span>
+        <ng-template #typing> {{ channel.typing }} is typing... </ng-template>
       </p>
     </a>
   </ul>
 
+  <!-- Bottom navbar -->
   <div
     class="card-header d-flex justify-content-around"
     style="height: 70px !important;"

@@ -1,4 +1,5 @@
 import { Channel } from './channel';
+import { User } from './user';
 
 
 export class ApiResponse<type>{
@@ -15,8 +16,15 @@ export class Pagination<type>{
     total: number;
 }
 
+export class ShortUser{
+    id:string;
+    name:string;
+}
+
 export class ChannelListener{
     channel:Channel;
     listener:any;
     name:string;
+    membersOnline= new Array<ShortUser>();
+    members = new Array<User>();
 }

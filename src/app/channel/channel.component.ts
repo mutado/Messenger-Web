@@ -62,14 +62,6 @@ export class ChannelComponent implements OnInit, OnDestroy {
         this.joined = true;
       else
         this.joined = false;
-      // this.channelService.joined(this.sock.selectedChannel.channel).subscribe(data => {
-      //   if (data.success) {
-      //     this.joined = true;
-      //   }
-      //   else {
-      //     this.joined = false;
-      //   }
-      // })
 
       this.msgListener = this.sock.selectedChannel.channel.messages.subscribe(data => {
         console.log(this.socketService.selectedChannel.channel.name)
@@ -135,7 +127,7 @@ export class ChannelComponent implements OnInit, OnDestroy {
 
   scrollWainting = false;
   public scrollCheck() {
-    if (this.scrollWainting  == true)
+    if (this.scrollWainting == true)
       return;
     this.scrollWainting = true;
 
@@ -152,7 +144,7 @@ export class ChannelComponent implements OnInit, OnDestroy {
 
     setTimeout(() => {
       this.scrollWainting = false;
-    }, 100);
+    }, 50);
   }
 
   getMessageTime(msg: Message) {
@@ -165,6 +157,13 @@ export class ChannelComponent implements OnInit, OnDestroy {
       var dt1 = new Date(prevMsg.created_at);
       var dt2 = new Date(currMsg.created_at);
       return dt1.getDay() != dt2.getDay();
+    }
+    return true;
+  }
+
+  isOtherUser(prevMsg: Message, currMsg: Message) {
+    if (prevMsg) {
+      return (prevMsg.user.id != currMsg.user.id) || (prevMsg.type != currMsg.type); 
     }
     return true;
   }
@@ -187,16 +186,16 @@ export class ChannelComponent implements OnInit, OnDestroy {
         var scrHeight = msgbox.prop("scrollHeight");
         var srcTop = document.getElementById('message-box').scrollTop;
 
-        console.log("scrTop: "+srcTop);
-        console.log("height: "+scrHeight);
- 
+        console.log("scrTop: " + srcTop);
+        console.log("height: " + scrHeight);
+
         // Append messages
         this.msgs.data = data.success.data.concat(this.msgs.data)
         setTimeout(() => {
           // Restore scrollbar position
           var hdiff = msgbox.prop("scrollHeight") - scrHeight;
           srcTop = msgbox.scrollTop();
-          console.log("new height: "+msgbox.prop("scrollHeight"));
+          console.log("new height: " + msgbox.prop("scrollHeight"));
           console.log(hdiff + srcTop)
           msgbox.scrollTop(hdiff + srcTop);
           // document.getElementById('message-box').scrollBy(0,hdiff + srcTop);
@@ -210,10 +209,14 @@ export class ChannelComponent implements OnInit, OnDestroy {
     this.channelService.join(this.channel).subscribe(data => {
       this.joined = true;
       this.sock.addChannel(this.sock.selectedChannel);
-      this.loadChannel(this.channel.id);
-      this.sendMessage("joined this channel","service")
-      console.log(this.sock.channels)
+      // this.loadChannel(this.channel.id);
+      this.sock.refreshMessages();
+      this.displayMessages();
     })
+  }
+
+  public typing() {
+    this.sock.selectedChannel.listener.whisper('typing', { name: this.user.name })
   }
 
   public scrollDown(speed = 'fast') {
@@ -237,7 +240,7 @@ export class ChannelComponent implements OnInit, OnDestroy {
 
   }
 
-  sendMessage(content:string,type="message"){
+  sendMessage(content: string, type = "message") {
     var message = new Message(
       content,
       this.user.id,

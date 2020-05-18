@@ -1,4 +1,4 @@
-<div class="jumbotron jumbotron-fluid">
+<div id="settings" class="jumbotron jumbotron-fluid">
   <div class="container">
     <div class="d-flex justify-content-between align-items-center">
       <h1 class="display-4 inline">@{{ this.user.username }}</h1>
@@ -10,13 +10,6 @@
         Edit
       </button>
     </div>
-    <!-- <ul class="list-group mt-1">
-      <li class="list-group-item mt-1">Full name: {{ this.user.name }}</li>
-    </ul>
-    <ul class="list-group mt-1">
-      <li class="list-group-item lead">Email: {{ this.user.email }}</li>
-      <li class="list-group-item lead">Role: {{ this.user.role }}</li>
-    </ul> -->
     <form [formGroup]="editForm" (submit)="saveUser()">
       <div class="form-group row">
         <label for="staticEmail" class="col-sm-2 col-form-label"

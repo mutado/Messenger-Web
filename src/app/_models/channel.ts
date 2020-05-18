@@ -13,4 +13,6 @@ export class Channel {
     _messages = new Pagination<Message[]>();
     messages = new Subject<Message>();
     displayReady:Promise<boolean>;
+    typing = null;
+    typingHandler:NodeJS.Timeout;
 }

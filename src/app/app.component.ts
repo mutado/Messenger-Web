@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 
 import { AuthenticationService } from './_services/authentication.service';
 import { User } from './_models/user';
@@ -15,6 +15,7 @@ declare global {
     interface Window { Echo: any; }
 }
 
+declare var $: any;
 
 window.io = window.io || require('socket.io-client');
 window.Echo = window.Echo || {};
@@ -28,40 +29,40 @@ export class AppComponent implements OnInit {
     currentUser: User;
     socket: io.SocketIOClient.Socket;
 
+    sidebarHidden: boolean = false;
+    rootHidden: boolean = false;
+
     constructor(
         private router: Router,
+        private route: ActivatedRoute,
         private authenticationService: AuthenticationService,
-        private webSocketService : WebSocketService
+        private webSocketService: WebSocketService
     ) {
         this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
-        // window.Echo = new Echo({
-        //     broadcaster: 'socket.io',
-        //     host: 'http://localhost:6001',
-        //     auth:
-        //     {
-        //         headers:
-        //         {
-        //             'Authorization': 'Bearer ' + this.currentUser.token
-        //         }
-        //     }
-        // });
 
-        // window.Echo.private('channel.1')
-        //     .listen('.NewMessage', (data) => {
-        //         console.log("recieved data");
-        //     });
-        // window.Echo.join(`channel.1`)
-        //     .here((users) => {
-        //         //
-        //     })
-        //     .joining((user) => {
-        //         console.log(user.name);
-        //     })
-        //     .leaving((user) => {
-        //         console.log(user.name);
-        //     });
     }
-    
+
+    checkHidden = ()=> {
+        if ($(window).width() < 960) {
+            if (this.router.url == '/')
+            {
+                console.log('here')
+                this.rootHidden = true;
+                this.sidebarHidden = false;
+            }
+            else
+            {
+                console.log('sidebar hidden')
+                this.sidebarHidden = true;
+                this.rootHidden = false;
+            }
+        }
+        else {
+            this.rootHidden = false;
+            this.sidebarHidden = false;
+        }
+    }
+
     ngOnInit(): void {
     }
 
